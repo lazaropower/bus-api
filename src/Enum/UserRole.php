@@ -7,4 +7,9 @@ enum UserRole: string {
     case STUDENT = 'student';
     case RETIRED = 'retired';
 
+    public static function getValues(): array
+    {
+        $reflectionClass = new \ReflectionClass(self::class);
+        return $reflectionClass->getConstants();
+    }
 }
