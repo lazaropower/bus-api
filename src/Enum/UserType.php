@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum UserRole: string {
+enum UserType: string {
     case STANDARD = 'standard';
     case STUDENT = 'student';
     case RETIRED = 'retired';

@@ -3,16 +3,18 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Enum\UserRole;
+use App\Enum\UserType;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -35,10 +37,14 @@ class User
     #[Assert\Length(max: 255)]
     private ?string $email = null;
 
+    #[ORM\Column(type: 'json')]
+    #[Assert\NotBlank]
+    private array $roles = [];
+
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Assert\Type(type: UserRole::class)]
-    private ?UserRole $role = null;
+    #[Assert\Type(type: UserType::class)]
+    private ?UserType $userType = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
@@ -99,14 +105,29 @@ class User
         return $this;
     }
 
-    public function getRole(): ?UserRole
+    public function getRoles(): array
     {
-        return $this->role;
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
-    public function setRole(UserRole $role): static
+    public function setRoles(array $roles): self
     {
-        $this->role = $role;
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function getUserType(): ?UserType
+    {
+        return $this->userType;
+    }
+
+    public function setUserType(UserType $userType): static
+    {
+        $this->userType = $userType;
 
         return $this;
     }
@@ -160,5 +181,15 @@ class User
         }
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // TODO: Implement eraseCredentials() method.
     }
 }
