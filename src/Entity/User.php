@@ -59,8 +59,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
 
+    #[Assert\NotBlank(groups: ['user:create'])]
+    #[Groups(['user:read', 'user:create'])]
     #[ORM\Column(type: 'json')]
-    #[Groups(['user:read'])]
     private array $roles = [];
 
     #[Assert\NotBlank(groups: ['user:create'])]
